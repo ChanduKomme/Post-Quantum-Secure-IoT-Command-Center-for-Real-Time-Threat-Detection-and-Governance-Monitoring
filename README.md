@@ -187,11 +187,21 @@ AES-128-CCM authenticated encryption
 
 Splunk is the central telemetry layer of the project. The BL602 Sender and Receiver send runtime events directly to Splunk through HTTP Event Collector. The backend then queries Splunk through the REST API and exposes the results to the dashboard and governance module.
 
+### PQC IoT Security Monitoring Dashboard
+
+This Splunk dashboard gives a high-level SIEM view of total events, detected attacks, high-risk events, active devices, event-type distribution, and timeline trends.
+
+![PQC IoT Security Monitoring Dashboard](docs/images/splunk/pqc_iot_security_monitoring_dashboard.png)
+
 ### Splunk-Powered Live Event Timeline
+
+This view shows live event counts and timeline panels generated from the `pqc_iot` index. It helps verify that the Sender and Receiver are continuously forwarding telemetry to Splunk.
 
 ![Splunk Powered Live Event Timeline](docs/images/splunk/splunk_powered_live_event_timeline.png)
 
-### Recent Security Events from Splunk
+### Recent Security Events and Attack Evidence
+
+This dashboard section highlights recent security events such as `MSG_DECRYPTED`, `PK_AUTH_OK`, `AEAD_AUTH_FAIL`, `REPLAY_REJECT`, `RATE_LIMIT_HIT`, and `SOURCE_BLOCKED`. These events are used later by the governance module as live evidence.
 
 ![Splunk Recent Security Events](docs/images/splunk/splunk_recent_security_events.png)
 
