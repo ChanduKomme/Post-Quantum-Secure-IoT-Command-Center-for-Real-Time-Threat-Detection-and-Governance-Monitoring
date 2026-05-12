@@ -1,0 +1,5 @@
+requests
+pyserial
+python-dotenv
+flask
+urllib3

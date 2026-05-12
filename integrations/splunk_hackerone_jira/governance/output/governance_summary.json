@@ -1,0 +1,164 @@
+{
+  "project": "PQC IoT \u2014 Post-Quantum Key Exchange Mechanisms for IoT",
+  "platform": "BL602/PineCone | ML-KEM-512 | AES-128-CCM | CoAP/UDP",
+  "generated_at": "2026-05-09T18:50:08.414883Z",
+  "framework": "OWASP IoT Top 10 (2018) + ENISA IoT Security Guidelines",
+  "data_source": "Splunk Live",
+  "splunk_host": "https://localhost:8089",
+  "risk_count": 10,
+  "residual_risk": {
+    "High": 0,
+    "Medium": 6,
+    "Low": 4
+  },
+  "controls": {
+    "fully_implemented": 7,
+    "partially_implemented": 3,
+    "not_implemented": 0
+  },
+  "compliance_score": "70%",
+  "posture": "ACCEPTABLE",
+  "total_splunk_events": 27321,
+  "event_counts": {
+    "PK_REQUEST": 5144,
+    "KEM_HKDF_DONE": 3562,
+    "AEAD_ENCRYPT_DONE": 3561,
+    "MSG_DECRYPTED": 3427,
+    "MSG_DELIVERED": 3420,
+    "RATE_LIMIT_HIT": 1877,
+    "META_REQUEST": 939,
+    "DATA_REQUEST": 921,
+    "HKDF_DONE": 908,
+    "KEM_DECAP_OK": 908,
+    "PK_AUTH_OK": 905,
+    "AEAD_DECRYPT_OK": 904,
+    "SEND_FAILED": 298,
+    "REPLAY_REJECT": 264,
+    "SOURCE_BLOCKED": 124,
+    "AEAD_AUTH_FAIL": 24,
+    "MONITOR_ACTIVE": 22,
+    "KEY_ACTIVE": 21,
+    "WIFI_CONNECTED": 40,
+    "MSG_RETRY": 12,
+    "GATEWAY_LISTENING": 6,
+    "PAIRING_CODE_READY": 6,
+    "RECEIVER_FINGERPRINT_READY": 6,
+    "SPLUNK_DIRECT_READY": 12,
+    "GATEWAY_DISCOVERY_OK": 4,
+    "SENDER_AUTH_FAIL": 4,
+    "GATEWAY_DISCOVERY_FAIL": 2
+  },
+  "device_stats": {
+    "gateway-01": 15532,
+    "sender-01": 11789
+  },
+  "severity_breakdown": {
+    "info": 24716,
+    "medium": 2277,
+    "high": 328
+  },
+  "status_breakdown": {
+    "Mitigated": 7,
+    "Accepted": 3
+  },
+  "category_breakdown": {
+    "Protocol Security": 2,
+    "Cryptographic Integrity": 1,
+    "Key Management": 2,
+    "Physical Security": 2,
+    "Availability": 1,
+    "Key Lifecycle": 1,
+    "Network Security": 1
+  },
+  "owasp_mapping": {
+    "R-001": "I3 \u2014 Insecure Ecosystem Interfaces",
+    "R-002": "I3 \u2014 Insecure Ecosystem Interfaces",
+    "R-003": "I3 \u2014 Insecure Ecosystem Interfaces",
+    "R-004": "I7 \u2014 Insecure Data Transfer and Storage",
+    "R-005": "I9 \u2014 Insecure Default Settings",
+    "R-006": "I7 \u2014 Insecure Data Transfer and Storage",
+    "R-007": "I3 \u2014 Insecure Ecosystem Interfaces",
+    "R-008": "I7 \u2014 Insecure Data Transfer and Storage",
+    "R-009": "I5 \u2014 Use of Insecure or Outdated Components",
+    "R-010": "I2 \u2014 Insecure Network Services"
+  },
+  "risks_by_level": {
+    "High": [],
+    "Medium": [
+      {
+        "id": "R-001",
+        "title": "Replay Attack",
+        "category": "Protocol Security",
+        "status": "Mitigated",
+        "owasp": "I3 \u2014 Insecure Ecosystem Interfaces"
+      },
+      {
+        "id": "R-002",
+        "title": "AEAD Authentication Failure",
+        "category": "Cryptographic Integrity",
+        "status": "Mitigated",
+        "owasp": "I3 \u2014 Insecure Ecosystem Interfaces"
+      },
+      {
+        "id": "R-004",
+        "title": "Unencrypted Key Storage in Flash",
+        "category": "Physical Security",
+        "status": "Accepted",
+        "owasp": "I7 \u2014 Insecure Data Transfer and Storage"
+      },
+      {
+        "id": "R-008",
+        "title": "Wi-Fi Network Eavesdropping",
+        "category": "Network Security",
+        "status": "Mitigated",
+        "owasp": "I7 \u2014 Insecure Data Transfer and Storage"
+      },
+      {
+        "id": "R-009",
+        "title": "Firmware Tampering via Re-flash",
+        "category": "Physical Security",
+        "status": "Accepted",
+        "owasp": "I5 \u2014 Use of Insecure or Outdated Components"
+      },
+      {
+        "id": "R-010",
+        "title": "TOFU First-Use Key Spoofing",
+        "category": "Key Management",
+        "status": "Accepted",
+        "owasp": "I2 \u2014 Insecure Network Services"
+      }
+    ],
+    "Low": [
+      {
+        "id": "R-003",
+        "title": "ML-KEM Public Key Substitution MITM",
+        "category": "Key Management",
+        "status": "Mitigated",
+        "owasp": "I3 \u2014 Insecure Ecosystem Interfaces"
+      },
+      {
+        "id": "R-005",
+        "title": "Rate Limit Bypass via Flooding",
+        "category": "Availability",
+        "status": "Mitigated",
+        "owasp": "I9 \u2014 Insecure Default Settings"
+      },
+      {
+        "id": "R-006",
+        "title": "Key Exhaustion Beyond Max Message Count",
+        "category": "Key Lifecycle",
+        "status": "Mitigated",
+        "owasp": "I7 \u2014 Insecure Data Transfer and Storage"
+      },
+      {
+        "id": "R-007",
+        "title": "CoAP URI Path Injection",
+        "category": "Protocol Security",
+        "status": "Mitigated",
+        "owasp": "I3 \u2014 Insecure Ecosystem Interfaces"
+      }
+    ]
+  },
+  "compliance_gap": "The 30% gap reflects BL602 hardware constraints (R-004, R-009) and deliberate demo config (R-010). Not cryptographic design gaps.",
+  "notes": "Risk selection grounded in OWASP IoT Top 10 (2018). Zero high residual risks confirmed."
+}

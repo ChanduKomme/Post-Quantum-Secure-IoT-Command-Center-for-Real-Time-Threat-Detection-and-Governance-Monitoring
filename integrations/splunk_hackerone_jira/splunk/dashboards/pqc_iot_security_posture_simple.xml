@@ -1,0 +1,270 @@
+<dashboard version="1.1" theme="dark">
+  <label>PQC-IoT Security Monitoring Dashboard</label>
+  <description>Enterprise-style dark theme • BL602 • ML-KEM-512 • HKDF-SHA-256 • AES-CCM • CoAP/UDP — Reference dashboard for Splunk-style monitoring, governance, incident visibility, and audit evidence</description>
+
+  <fieldset submitButton="false">
+    <input type="time" token="time_tok">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <!-- ═══════════════════════════════════════════════════
+       ROW 1 — Top KPI tiles
+       ═══════════════════════════════════════════════════ -->
+  <row>
+    <panel>
+      <single>
+        <title>Total Device Events</title>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" | stats count as value</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="useColors">0</option>
+        <option name="underLabel">all sources</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendInterval">-1h</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Auth Failures</title>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type IN (AEAD_AUTH_FAIL,PK_AUTH_FAIL) | stats count as value</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="useColors">1</option>
+        <option name="colorBy">value</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="underLabel">AEAD + PK failures</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendInterval">-1h</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Replay Rejects</title>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type=REPLAY_REJECT | stats count as value</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="useColors">1</option>
+        <option name="colorBy">value</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="underLabel">dropped packets</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendInterval">-1h</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Key Lifecycle Events</title>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type IN (KEY_ROTATED,KEY_EXPIRED,KEY_REVOKED,KEY_ACTIVE) | stats count as value</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="useColors">0</option>
+        <option name="underLabel">rotation + expiry events</option>
+        <option name="showTrendIndicator">0</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- ═══════════════════════════════════════════════════
+       ROW 2 — System Health | Crypto Events | Key Governance
+       ═══════════════════════════════════════════════════ -->
+  <row>
+    <panel>
+      <title>System Health</title>
+      <table>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event"
+| eval Device=coalesce(device_id, host, "unknown")
+| eval Status=case(
+    event_type IN ("WIFI_CONNECTED","BOOT_OK","MONITOR_ACTIVE","KEY_ACTIVE"), "ONLINE",
+    event_type IN ("AEAD_AUTH_FAIL","PK_AUTH_FAIL","REPLAY_REJECT"), "ALERT",
+    true(), "ONLINE")
+| stats latest(event_type) as "Last Event" latest(Status) as Status by Device
+| eval "Firmware Profile"=if(match('Last Event',"PK_AUTH|AEAD|REPLAY"),"STRICT","STRICT")
+| table Device Status "Last Event" "Firmware Profile"</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">6</option>
+        <format type="color" field="Status">
+          <colorPalette type="map">{"ONLINE":"#53a051","ALERT":"#dc4e41","OFFLINE":"#f8be34"}</colorPalette>
+        </format>
+        <format type="color" field="Last Event">
+          <colorPalette type="map">{"AEAD_AUTH_FAIL":"#dc4e41","PK_AUTH_FAIL":"#dc4e41","REPLAY_REJECT":"#f8be34","RATE_LIMIT_HIT":"#f8be34","WIFI_CONNECTED":"#53a051","BOOT_OK":"#53a051","KEY_ACTIVE":"#0099e0","KEY_ROTATED":"#53a051"}</colorPalette>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Crypto &amp; Protocol Security Events</title>
+      <chart>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type IN (PK_AUTH_FAIL,AEAD_AUTH_FAIL,REPLAY_REJECT,RATE_LIMIT_HIT,KEY_EXPIRED,KEY_REVOKED)
+| stats count by event_type
+| sort - count</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.orientation">horizontal</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">["0xdc4e41","0xf8be34","0xf8be34","0xf8be34","0x6db7c4","0x9e69be"]</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Key Lifecycle &amp; Governance</title>
+      <chart>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type IN (KEY_ACTIVE,KEY_ROTATED,KEY_EXPIRED,KEY_REVOKED)
+| stats count by event_type</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.seriesColors">["0x0099e0","0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ═══════════════════════════════════════════════════
+       ROW 3 — Threat Timeline | Audit Evidence Feed
+       ═══════════════════════════════════════════════════ -->
+  <row>
+    <panel>
+      <title>Threat Activity &amp; Resilience Monitoring</title>
+      <chart>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type IN (PK_AUTH_FAIL,AEAD_AUTH_FAIL,REPLAY_REJECT,RATE_LIMIT_HIT)
+| timechart span=30m count by event_type limit=5 useother=f</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.seriesColors">["0xdc4e41","0xf8be34","0x0099e0","0x53a051"]</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Audit Timeline / Evidence Feed</title>
+      <table>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type!=UNSPECIFIED_EVENT
+| eval Device=coalesce(device_id, host, "unknown")
+| eval Severity=upper(severity)
+| eval Action=coalesce(action, "-")
+| table _time Device event_type Severity Action
+| rename _time as Time, event_type as Event
+| sort - Time
+| head 20</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <format type="color" field="Severity">
+          <colorPalette type="map">{"HIGH":"#dc4e41","MED":"#f8be34","MEDIUM":"#f8be34","LOW":"#53a051","INFO":"#0099e0"}</colorPalette>
+        </format>
+        <format type="color" field="Event">
+          <colorPalette type="map">{"AEAD_AUTH_FAIL":"#dc4e41","PK_AUTH_FAIL":"#dc4e41","REPLAY_REJECT":"#f8be34","RATE_LIMIT_HIT":"#f8be34","KEY_ROTATED":"#53a051","KEY_ACTIVE":"#0099e0","KEY_EXPIRED":"#f8be34","KEY_REVOKED":"#dc4e41"}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ═══════════════════════════════════════════════════
+       ROW 4 — Stacked events over time (full width)
+       ═══════════════════════════════════════════════════ -->
+  <row>
+    <panel>
+      <title>Notable Events Over Time (all security event types)</title>
+      <chart>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type!=UNSPECIFIED_EVENT
+| timechart span=1h count by event_type limit=10 useother=f</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.seriesColors">["0xdc4e41","0xf8be34","0x0099e0","0x53a051","0x6db7c4","0x9e69be","0xf06b29","0x4c9f47"]</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ═══════════════════════════════════════════════════
+       ROW 5 — Top sources | Recent raw events
+       ═══════════════════════════════════════════════════ -->
+  <row>
+    <panel>
+      <title>Top Notable Event Sources</title>
+      <table>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type!=UNSPECIFIED_EVENT
+| eval src=coalesce(device_id, peer_ip, host, "unknown-device")
+| stats count by src event_type
+| sort - count
+| head 15
+| rename src as Source, event_type as "Event Type", count as Count</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <format type="color" field="Event Type">
+          <colorPalette type="map">{"AEAD_AUTH_FAIL":"#dc4e41","PK_AUTH_FAIL":"#dc4e41","REPLAY_REJECT":"#f8be34","RATE_LIMIT_HIT":"#f8be34","KEY_ROTATED":"#53a051","KEY_ACTIVE":"#0099e0"}</colorPalette>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Recent Raw Events</title>
+      <table>
+        <search>
+          <query>index=pqc_iot sourcetype="pqc:iot:event" event_type!=UNSPECIFIED_EVENT
+| eval Device=coalesce(device_id, host, "unknown")
+| table _time Device event_type severity action role
+| rename _time as Time, event_type as "Event Type", severity as Severity
+| sort - Time
+| head 15</query>
+          <earliest>$time_tok.earliest$</earliest>
+          <latest>$time_tok.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <format type="color" field="Severity">
+          <colorPalette type="map">{"high":"#dc4e41","medium":"#f8be34","low":"#53a051","info":"#0099e0"}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+
+</dashboard>

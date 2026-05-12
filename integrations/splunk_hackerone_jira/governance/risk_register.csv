@@ -1,0 +1,16 @@
+Risk ID,Risk Title,Category,Residual Risk,Control Implemented,Status,OWASP IoT Top 10 Mapping,Exclusion Justification
+R-001,Replay Attack,Protocol Security,Medium,Yes,Mitigated,I3 — Insecure Ecosystem Interfaces,
+R-002,AEAD Authentication Failure,Cryptographic Integrity,Medium,Yes,Mitigated,I3 — Insecure Ecosystem Interfaces,
+R-003,ML-KEM Public Key Substitution MITM,Key Management,Low,Yes,Mitigated,I3 — Insecure Ecosystem Interfaces,
+R-004,Unencrypted Key Storage in Flash,Physical Security,Medium,Partial,Accepted,I7 — Insecure Data Transfer and Storage,BL602 lacks hardware AES-XTS flash encryption in open SDK. Requires external secure element. Accepted as hardware constraint.
+R-005,Rate Limit Bypass via Flooding,Availability,Low,Yes,Mitigated,I9 — Insecure Default Settings,
+R-006,Key Exhaustion Beyond Max Message Count,Key Lifecycle,Low,Yes,Mitigated,I7 — Insecure Data Transfer and Storage,
+R-007,CoAP URI Path Injection,Protocol Security,Low,Yes,Mitigated,I3 — Insecure Ecosystem Interfaces,
+R-008,Wi-Fi Network Eavesdropping,Network Security,Medium,Yes,Mitigated,I7 — Insecure Data Transfer and Storage,
+R-009,Firmware Tampering via Re-flash,Physical Security,Medium,Partial,Accepted,I5 — Use of Insecure or Outdated Components,BL602 open SDK does not expose secure boot API for PineCone. Requires vendor toolchain. Accepted as platform constraint.
+R-010,TOFU First-Use Key Spoofing,Key Management,Medium,Partial,Accepted,I2 — Insecure Network Services,Demo convenience. Switch to STRICT mode for production (config change only — no code change needed).
+,,,,,,I4 — Lack of Secure Update Mechanism,EXCLUDED: BL602 firmware updates require physical hardware access via wired flash procedure (IO8 bridge + blflash). Remote exploitation of the update mechanism is not applicable to this deployment model and is consciously out of scope.
+,,,,,,I1 — Weak/Hardcoded Passwords,EXCLUDED: No password authentication in this system. Authentication uses ML-KEM-512 public-key cryptography and SHA-256 fingerprint pinning — not passwords.
+,,,,,,I6 — Insufficient Privacy Protection,EXCLUDED: This system transmits sensor/command data only. No personally identifiable information is processed or stored.
+,,,,,,I8 — Lack of Device Management,EXCLUDED: Key lifecycle management is implemented via /pqkem-meta endpoint tracking key_id, message_count, rotation_required and expiry. Full device fleet management is out of scope for this prototype.
+,,,,,,I10 — Lack of Physical Hardening,EXCLUDED: Physical hardening (tamper-evident enclosures etc.) is a hardware procurement decision outside firmware scope. Flash-level key protection is addressed under R-004.

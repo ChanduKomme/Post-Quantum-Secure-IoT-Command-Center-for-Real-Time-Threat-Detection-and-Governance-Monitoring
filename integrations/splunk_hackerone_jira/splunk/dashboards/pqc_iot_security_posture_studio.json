@@ -1,0 +1,94 @@
+{
+  "title": "PQC-IoT Security Posture",
+  "description": "Dashboard Studio layout modeled after a Splunk ES-style security posture page.",
+  "defaults": {
+    "dataSources": {
+      "ds.search": {
+        "options": {
+          "queryParameters": {
+            "earliest": "-24h@h",
+            "latest": "now"
+          }
+        }
+      }
+    },
+    "visualizations": {
+      "splunk.singlevalue": {
+        "showProgressBar": false,
+        "showSparkline": false,
+        "showTrendIndicator": false,
+        "backgroundColor": "#131a22",
+        "majorColor": "#ffffff",
+        "trendColor": "#ff375f"
+      },
+      "splunk.table": {
+        "backgroundColor": "#131a22"
+      },
+      "splunk.bar": {
+        "backgroundColor": "#131a22"
+      },
+      "splunk.line": {
+        "backgroundColor": "#131a22"
+      },
+      "splunk.markdown": {
+        "backgroundColor": "transparent"
+      }
+    }
+  },
+  "inputs": {},
+  "dataSources": {
+    "ds_access": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event event_type IN (PK_AUTH_FAIL,REPLAY_REJECT,AEAD_AUTH_FAIL) | stats count as value"}},
+    "ds_endpoint": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event event_type IN (BOOT_OK,WIFI_CONNECTED,MONITOR_ACTIVE) | stats count as value"}},
+    "ds_network": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event event_type IN (RATE_LIMIT_HIT,INVALID_REQUEST,PK_AUTH_FAIL) | stats count as value"}},
+    "ds_identity": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event event_type IN (PK_AUTH_FAIL,KEY_REVOKED,KEY_EXPIRED) | stats count as value"}},
+    "ds_audit": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event action IN (\"packet rejected\",\"session aborted\",\"message dropped\") | stats count as value"}},
+    "ds_threat": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event severity=high OR severity=critical | stats count as value"}},
+    "ds_urgency": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event | eval urgency=case(severity=\"critical\",\"critical\",severity=\"high\",\"high\",severity=\"medium\",\"medium\",true(),\"low\") | stats count by urgency | sort - count"}},
+    "ds_time": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event event_type IN (PK_AUTH_FAIL,AEAD_AUTH_FAIL,REPLAY_REJECT,RATE_LIMIT_HIT) | timechart span=30m count by event_type limit=4 useother=f"}},
+    "ds_top_events": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event | stats sparkline(count,1h) as sparkline count by event_type | sort - count | rename event_type as rule_name | head 10"}},
+    "ds_top_src": {"type": "ds.search", "options": {"query": "index=pqc_iot sourcetype=pqc:iot:event | eval src=coalesce(peer_ip,src,device_id) | stats sparkline(count,1h) as sparkline count by src | sort - count | head 10"}}
+  },
+  "visualizations": {
+    "title_md": {
+      "type": "splunk.markdown",
+      "options": {"markdown": "# Security Posture"}
+    },
+    "viz_access": {"type": "splunk.singlevalue", "title": "ACCESS NOTABLES", "description": "Total Count", "dataSources": {"primary": "ds_access"}},
+    "viz_endpoint": {"type": "splunk.singlevalue", "title": "ENDPOINT NOTABLES", "description": "Total Count", "dataSources": {"primary": "ds_endpoint"}},
+    "viz_network": {"type": "splunk.singlevalue", "title": "NETWORK NOTABLES", "description": "Total Count", "dataSources": {"primary": "ds_network"}},
+    "viz_identity": {"type": "splunk.singlevalue", "title": "IDENTITY NOTABLES", "description": "Total Count", "dataSources": {"primary": "ds_identity"}},
+    "viz_audit": {"type": "splunk.singlevalue", "title": "AUDIT NOTABLES", "description": "Total Count", "dataSources": {"primary": "ds_audit"}},
+    "viz_threat": {"type": "splunk.singlevalue", "title": "THREAT NOTABLES", "description": "Total Count", "dataSources": {"primary": "ds_threat"}},
+    "viz_urgency": {
+      "type": "splunk.bar",
+      "title": "Notable Events By Urgency",
+      "dataSources": {"primary": "ds_urgency"},
+      "options": {"orientation": "horizontal", "showLegend": true}
+    },
+    "viz_overtime": {
+      "type": "splunk.line",
+      "title": "Notable Events Over Time",
+      "dataSources": {"primary": "ds_time"},
+      "options": {"showLegend": true}
+    },
+    "viz_top_events": {"type": "splunk.table", "title": "Top Notable Events", "dataSources": {"primary": "ds_top_events"}},
+    "viz_top_src": {"type": "splunk.table", "title": "Top Notable Event Sources", "dataSources": {"primary": "ds_top_src"}}
+  },
+  "layout": {
+    "type": "absolute",
+    "options": {"width": 1365, "height": 820},
+    "structure": [
+      {"item": "title_md", "type": "block", "position": {"x": 18, "y": 20, "w": 250, "h": 45}},
+      {"item": "viz_access", "type": "block", "position": {"x": 18, "y": 90, "w": 215, "h": 120}},
+      {"item": "viz_endpoint", "type": "block", "position": {"x": 238, "y": 90, "w": 215, "h": 120}},
+      {"item": "viz_network", "type": "block", "position": {"x": 458, "y": 90, "w": 215, "h": 120}},
+      {"item": "viz_identity", "type": "block", "position": {"x": 678, "y": 90, "w": 215, "h": 120}},
+      {"item": "viz_audit", "type": "block", "position": {"x": 898, "y": 90, "w": 215, "h": 120}},
+      {"item": "viz_threat", "type": "block", "position": {"x": 1118, "y": 90, "w": 215, "h": 120}},
+      {"item": "viz_urgency", "type": "block", "position": {"x": 18, "y": 230, "w": 650, "h": 225}},
+      {"item": "viz_overtime", "type": "block", "position": {"x": 688, "y": 230, "w": 645, "h": 225}},
+      {"item": "viz_top_events", "type": "block", "position": {"x": 18, "y": 475, "w": 650, "h": 285}},
+      {"item": "viz_top_src", "type": "block", "position": {"x": 688, "y": 475, "w": 645, "h": 285}}
+    ]
+  }
+}

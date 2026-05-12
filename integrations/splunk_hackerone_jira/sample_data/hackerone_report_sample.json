@@ -1,0 +1,10 @@
+{
+  "event": "report_created",
+  "data": {
+    "id": "H1-2026-001",
+    "title": "Replay window bypass attempt",
+    "severity": "medium",
+    "state": "triaged",
+    "reporter": "researcher-demo"
+  }
+}
