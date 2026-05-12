@@ -123,30 +123,6 @@ sequenceDiagram
     Splunk->>Dashboard: Live security telemetry
 ```
 
----
-
-## Repository Structure
-
-```text
-PQC_final/
-├── sender/                         # BL602 Sender firmware
-├── Receiver/                       # BL602 Receiver/Gateway firmware
-├── sniffer/                        # Optional Wi-Fi sniffer firmware/tools
-├── host-tools/                     # Provisioning and helper tools
-├── pqc_attacks/                    # Defensive attack validation suite
-├── integrations/
-│   └── splunk_hackerone_jira/
-│       ├── splunk/                 # Splunk discovery, HEC helpers, dashboards
-│       └── governance/             # Live governance report and risk mapping
-├── dashboard/
-│   ├── backend/                    # FastAPI backend for dashboard APIs
-│   └── frontend/                   # React frontend Security Command Center
-├── docs/
-│   └── images/                     # README screenshots and documentation images
-├── tools/                          # Build and run scripts
-├── .env.example                    # Safe environment template
-└── README.md
-```
 
 ---
 
@@ -390,25 +366,6 @@ The project includes a defensive attack validation suite in `pqc_attacks/`. Thes
 | 05 | Malformed CoAP injection | Malformed packet rejected | `SOURCE_BLOCKED` |
 | 06 | Public-key substitution | Fingerprint mismatch detected | `PK_AUTH_FAIL` |
 
-Run all tests:
-
-```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final/pqc_attacks
-pyenv activate bl_venv
-python3 run_all.py
-```
-
-Run one test:
-
-```bash
-python3 run_all.py --only 01
-python3 run_all.py --only 02
-python3 run_all.py --only 03
-python3 run_all.py --only 04
-python3 run_all.py --only 05
-python3 run_all.py --only 06
-```
-
 ---
 
 ## Hardware Requirements
@@ -447,7 +404,7 @@ python3 run_all.py --only 06
 Create a local `.env` file from the template.
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final
+
 cp .env.example .env
 nano .env
 ```
@@ -485,7 +442,7 @@ PQC_CORRECT_FP=CHANGE_ME_64_HEX_CHARS
 ### Build Firmware
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final
+cd PQC_project
 pyenv activate bl_venv
 
 export BL60X_SDK_PATH=~/sdk/bl602_iot_sdk
@@ -508,14 +465,14 @@ ls /dev/ttyUSB*
 Flash Receiver:
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final/Receiver
+cd Receiver
 blflash flash build_out/Receiver.bin --port /dev/ttyUSB1
 ```
 
 Flash Sender:
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final/sender
+cd sender
 blflash flash build_out/sender.bin --port /dev/ttyUSB0
 ```
 
@@ -534,7 +491,7 @@ http://localhost:8000
 ### Start Splunk Discovery Server
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final/integrations/splunk_hackerone_jira/splunk
+cd ~PQC_project/integrations/splunk_hackerone_jira/splunk
 pyenv activate bl_venv
 python3 splunk_discovery_server.py --hec-port 8088 --proactive
 ```
@@ -542,7 +499,7 @@ python3 splunk_discovery_server.py --hec-port 8088 --proactive
 ### Start Receiver Monitor
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final
+cd PQC_project
 pyenv activate bl_venv
 python3 sender/tools/monitor/monitor.py -d /dev/ttyUSB1 -b 2000000
 ```
@@ -552,7 +509,7 @@ Reset the Receiver board.
 ### Start Sender Monitor
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final
+cd PQC_project
 pyenv activate bl_venv
 python3 sender/tools/monitor/monitor.py -d /dev/ttyUSB0 -b 2000000
 ```
@@ -566,7 +523,7 @@ Reset the Sender board.
 Single-port mode:
 
 ```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final
+cd PQC_project
 pyenv activate bl_venv
 bash tools/run_security_command_center_single_port.sh
 ```
@@ -581,7 +538,7 @@ Development mode:
 
 ```bash
 # Backend
-cd ~/sdk/bl602_iot_sdk/PQC_final/dashboard/backend
+cd ~/PQC_project/dashboard/backend
 pyenv activate bl_venv
 pip install -r requirements.txt
 python3 app.py
@@ -589,7 +546,7 @@ python3 app.py
 
 ```bash
 # Frontend
-cd ~/sdk/bl602_iot_sdk/PQC_final/dashboard/frontend
+cd ~/PQC_project/dashboard/frontend
 npm install
 npm run dev
 ```
@@ -630,57 +587,6 @@ http://localhost:5173
 | Flood/rate-limit detection | Verified | `RATE_LIMIT_HIT`, `SOURCE_BLOCKED` |
 | Wrong sender rejection | Verified | `SENDER_AUTH_FAIL` |
 | Governance mapping | Verified | Dashboard and governance report |
-
----
-
-## GitHub Safety Checklist
-
-Before pushing:
-
-```bash
-git status
-```
-
-Make sure these are not committed:
-
-```text
-.env
-*.env
-build_out/
-*.bin
-*.elf
-node_modules/
-.venv/
-real Splunk tokens
-real Splunk passwords
-```
-
-Recommended `.gitignore`:
-
-```gitignore
-.env
-*.env
-.env.*
-!.env.example
-__pycache__/
-*.pyc
-.venv/
-venv/
-node_modules/
-dashboard/frontend/node_modules/
-build_out/
-*/build_out/
-*.bin
-*.elf
-*.map
-*.hex
-*.log
-output/
-*.zip
-.vscode/
-.idea/
-.DS_Store
-```
 
 ---
 
