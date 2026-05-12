@@ -1,49 +1,71 @@
 # Post-Quantum Secure IoT Command Center for Real-Time Threat Detection and Governance Monitoring
 
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-BL602%20%2F%20PineCone-blue)](https://wiki.pine64.org/wiki/PineCone)
-[![Crypto](https://img.shields.io/badge/Crypto-ML--KEM--512%20%2B%20HKDF%20%2B%20AES--CCM-green)](https://csrc.nist.gov/projects/post-quantum-cryptography)
-[![Monitoring](https://img.shields.io/badge/SIEM-Splunk-orange)](https://www.splunk.com/)
+[![Crypto](https://img.shields.io/badge/Crypto-ML--KEM--512%20%2B%20HKDF--SHA--256%20%2B%20AES--CCM-green)](https://csrc.nist.gov/projects/post-quantum-cryptography)
+[![Protocol](https://img.shields.io/badge/Protocol-CoAP%20%2F%20UDP-lightgrey)](#protocol-flow)
+[![Monitoring](https://img.shields.io/badge/SIEM-Splunk-orange)](#splunk-live-monitoring)
 [![Dashboard](https://img.shields.io/badge/UI-Security%20Command%20Center-purple)](#security-command-center-dashboard)
+[![Governance](https://img.shields.io/badge/GRC-Live%20Risk%20Evidence-red)](#governance-and-risk-reporting)
 
 ## 🔗 Project Overview
 
-**Post-Quantum IoT Security Command Center** is an end-to-end research prototype for securing constrained IoT communication against current network attacks and future quantum threats. The system uses **BL602 / PineCone** microcontrollers for real embedded communication, **ML-KEM-512** for post-quantum key establishment, **HKDF-SHA-256** for key derivation, and **AES-128-CCM** for authenticated encryption over **CoAP/UDP**.
+**Post-Quantum IoT Security Command Center** is an end-to-end cybersecurity research prototype for securing constrained IoT communication against current network attacks and future quantum threats. The system uses **BL602 / PineCone** microcontrollers, **ML-KEM-512** for post-quantum key establishment, **HKDF-SHA-256** for key derivation, and **AES-128-CCM** for authenticated encryption over **CoAP/UDP**.
 
-The project goes beyond a basic encryption demo. It combines secure firmware, live Splunk telemetry, attack validation, governance risk reporting, and a frontend dashboard into one complete cybersecurity pipeline.
+This repository is not only a firmware project. It combines secure embedded communication, direct Splunk telemetry, defensive attack validation, live governance reporting, and a frontend Security Command Center into one complete security pipeline.
 
 > [!NOTE]
-> The repository contains firmware for **Sender**, **Receiver/Gateway**, optional **Sniffer**, attack validation scripts, Splunk integration, governance reporting, and a web-based Security Command Center.
+> The project contains BL602 Sender firmware, BL602 Receiver/Gateway firmware, optional sniffer tooling, Splunk integration, attack validation scripts, governance reporting, and a React/FastAPI Security Command Center dashboard.
 
 > [!IMPORTANT]
-> Do not commit real `.env` files, Splunk HEC tokens, Splunk passwords, or generated firmware binaries. Firmware builds can contain build-time telemetry configuration.
+> Do **not** commit real `.env` files, Splunk HEC tokens, Splunk passwords, generated firmware binaries, or build outputs. Firmware builds can contain build-time telemetry configuration.
 
 ---
 
-## 📸 Security Command Center Preview
+## 📸 Project Preview
+
+### Security Command Center Overview
 
 ![Security Command Center Overview](docs/images/dashboard/security_command_center_overview.png)
 
-The dashboard provides one place to view live Splunk telemetry, device status, attack evidence, governance status, and risk posture.
+The dashboard gives a SOC-style view of total security events, active devices, attack evidence, compliance posture, and live telemetry collected from Splunk.
 
 ---
 
 ## Abstract
 
-Classical public-key cryptography used in IoT deployments may become vulnerable to large-scale quantum computers. This project demonstrates a practical post-quantum secure communication prototype on BL602 microcontrollers. A Sender device obtains the Receiver/Gateway public key, verifies its fingerprint, performs ML-KEM-512 encapsulation, derives an AES session key using HKDF-SHA-256, and transmits an AES-128-CCM protected CoAP message. The Receiver validates sender identity, key identifier, sequence freshness, nonce reuse, and authentication tags before decrypting the payload.
+Classical public-key cryptography used in IoT deployments may become vulnerable when large-scale quantum computers become practical. This project demonstrates a post-quantum secure IoT communication prototype on BL602 microcontrollers. A Sender obtains the Receiver/Gateway public key, verifies the public-key fingerprint, performs ML-KEM-512 encapsulation, derives an AES session key using HKDF-SHA-256, and transmits an AES-128-CCM protected CoAP message. The Receiver validates sender identity, key ID, sequence freshness, nonce reuse, and authentication tags before accepting and decrypting the payload.
 
-Security events generated by the boards are forwarded to Splunk through HTTP Event Collector. A FastAPI backend reads Splunk events and exposes them to a React-based Security Command Center. The project also includes attack validation and governance mapping to OWASP IoT-style risks. This creates a full pipeline from embedded cryptographic protection to SOC monitoring and compliance evidence.
+The system forwards runtime security events to Splunk using HTTP Event Collector. A FastAPI backend queries Splunk and exposes the data to a React-based Security Command Center. A defensive attack suite validates replay protection, AEAD tamper detection, sender validation, rate limiting, malformed packet handling, and public-key substitution detection. A governance module maps live Splunk evidence to risk controls and produces an audit-ready security posture report.
+
+---
+
+## Table of Contents
+
+- [System Scenario](#system-scenario)
+- [High-Level Architecture](#high-level-architecture)
+- [Protocol Flow](#protocol-flow)
+- [Repository Structure](#repository-structure)
+- [Firmware Runtime Evidence](#firmware-runtime-evidence)
+- [Splunk Live Monitoring](#splunk-live-monitoring)
+- [Security Command Center Dashboard](#security-command-center-dashboard)
+- [Governance and Risk Reporting](#governance-and-risk-reporting)
+- [Attack Validation](#attack-validation)
+- [Build and Run](#build-and-run)
+- [GitHub Safety Checklist](#github-safety-checklist)
+- [Future Work](#future-work)
 
 ---
 
 ## System Scenario
 
-The system implements a layered secure IoT communication model with monitoring and governance evidence.
+The system implements a layered secure IoT model with live monitoring and governance evidence.
 
-- The **Sender** connects to Wi-Fi, discovers the Receiver/Gateway, obtains the public key, verifies the fingerprint, performs ML-KEM encapsulation, encrypts application data, and sends protected CoAP traffic.
-- The **Receiver/Gateway** stores or generates an ML-KEM key pair, serves its public key, receives encrypted data, decapsulates the KEM ciphertext, derives the same AES key, verifies AES-CCM authentication, and decrypts the payload.
-- **Splunk** receives live telemetry events such as `PK_AUTH_OK`, `KEM_HKDF_DONE`, `MSG_DELIVERED`, `MSG_DECRYPTED`, `REPLAY_REJECT`, and `AEAD_AUTH_FAIL`.
-- The **Security Command Center** visualizes live events, attack results, governance evidence, and device status.
+- The **Sender** connects to Wi-Fi, discovers the Receiver/Gateway, requests the public key, verifies the fingerprint, performs ML-KEM encapsulation, derives an AES key, encrypts the payload, and sends protected CoAP data.
+- The **Receiver/Gateway** loads or generates an ML-KEM key pair, serves public-key metadata, decapsulates the KEM ciphertext, derives the AES key, authenticates the message, decrypts valid payloads, and rejects invalid traffic.
+- **Splunk** receives runtime events such as `WIFI_CONNECTED`, `PK_AUTH_OK`, `KEM_HKDF_DONE`, `MSG_DELIVERED`, `MSG_DECRYPTED`, `REPLAY_REJECT`, `AEAD_AUTH_FAIL`, and `PK_AUTH_FAIL`.
+- The **Security Command Center** visualizes device status, live events, attack validation, governance posture, and risk evidence in a single frontend.
 
 ---
 
@@ -60,7 +82,7 @@ flowchart LR
     B --> F[React Security Command Center]
 ```
 
-> 📌 Optional image slot: replace this Mermaid diagram with your own architecture image if needed.
+> 📌 Optional image slot for your own architecture diagram:
 >
 > ```markdown
 > ![Overall Architecture](docs/images/architecture/overall_architecture.png)
@@ -71,15 +93,15 @@ flowchart LR
 ## Protocol Flow
 
 1. Sender and Receiver boot and connect to the same Wi-Fi network.
-2. Receiver loads or generates its long-term ML-KEM-512 key pair.
+2. Receiver loads or generates its ML-KEM-512 key pair.
 3. Sender discovers the Receiver/Gateway automatically.
-4. Sender requests Receiver public key using the `/pqkem-pk` CoAP endpoint.
+4. Sender requests the Receiver public key using `/pqkem-pk`.
 5. Sender verifies the Receiver public-key fingerprint.
-6. Sender performs ML-KEM-512 encapsulation and obtains a shared secret.
+6. Sender performs ML-KEM encapsulation and obtains a shared secret.
 7. Sender derives an AES-128 key using HKDF-SHA-256.
 8. Sender encrypts the application message using AES-128-CCM.
 9. Receiver validates sender ID, key ID, sequence number, nonce freshness, and AEAD tag.
-10. Receiver decrypts the message and reports telemetry to Splunk.
+10. Receiver decrypts the message, sends an ACK, and reports telemetry to Splunk.
 
 ```mermaid
 sequenceDiagram
@@ -128,82 +150,25 @@ PQC_final/
 
 ---
 
-## What This Project Does
-
-### Sender Firmware
-
-1. Connects to Wi-Fi.
-2. Discovers Receiver/Gateway automatically.
-3. Retrieves Receiver public key via `/pqkem-pk`.
-4. Verifies the public-key fingerprint.
-5. Performs ML-KEM-512 encapsulation.
-6. Derives AES key using HKDF-SHA-256.
-7. Encrypts the message using AES-128-CCM.
-8. Sends protected data via `/pqkem-data`.
-9. Sends direct telemetry to Splunk.
-
-### Receiver / Gateway Firmware
-
-1. Connects to Wi-Fi.
-2. Loads or generates ML-KEM-512 key pair.
-3. Serves public key and metadata endpoints.
-4. Receives encrypted CoAP data.
-5. Validates sender ID, key ID, sequence number, and nonce freshness.
-6. Performs ML-KEM decapsulation.
-7. Derives AES key using HKDF-SHA-256.
-8. Authenticates and decrypts using AES-128-CCM.
-9. Rejects replayed, malformed, tampered, and unauthorized packets.
-10. Sends direct telemetry to Splunk.
-
-### Splunk and Dashboard Layer
-
-1. Boards send events to Splunk HEC.
-2. Backend queries Splunk REST API.
-3. Dashboard displays telemetry and risk evidence.
-4. Governance engine maps events to project risks.
-5. Attack validation results are visible in one UI.
-
----
-
-## Runtime Firmware Evidence
+## Firmware Runtime Evidence
 
 ### Sender Serial Output
 
-The Sender repeatedly verifies the Receiver fingerprint, performs KEM/HKDF, encrypts the message, receives an ACK, and sends telemetry events.
+The Sender verifies the Receiver fingerprint, completes KEM/HKDF, encrypts the payload, receives ACKs, and reports security events.
 
 ![Sender Serial Output](docs/images/firmware/sender_serial_output.png)
 
 ### Receiver Serial Output
 
-The Receiver accepts `/pqkem-pk`, `/pqkem-meta`, and `/pqkem-data` requests, decapsulates the KEM ciphertext, authenticates the message, decrypts the payload, and reports `MSG_DECRYPTED`.
+The Receiver serves public-key metadata, receives encrypted data, decapsulates the KEM ciphertext, authenticates and decrypts the payload, and reports `MSG_DECRYPTED`.
 
 ![Receiver Serial Output](docs/images/firmware/receiver_serial_output.png)
 
 ---
 
-## Security Command Center Dashboard
-
-The React dashboard provides a live view of the system status. It is designed for SOC-style presentation and project demonstration.
-
-### Overview Page
-
-![Security Command Center Overview](docs/images/dashboard/security_command_center_overview.png)
-
-### Live Event Timeline and Attack Validation
-
-![Live Events and Attack Validation](docs/images/dashboard/live_events_and_attack_validation.png)
-
-### Governance Risk Register
-
-![Governance Risk Register Top](docs/images/dashboard/governance_risk_register_top.png)
-
-![Governance Risk Register Bottom](docs/images/dashboard/governance_risk_register_bottom.png)
-
----
-
 ## Cryptographic Design
 
-The project follows a clean **KEM → KDF → AEAD** design.
+The system follows a clean **KEM → KDF → AEAD** design.
 
 ```text
 ML-KEM-512 shared secret
@@ -215,24 +180,14 @@ AES-128 session key
 AES-128-CCM authenticated encryption
 ```
 
-### ML-KEM-512
-
-- Provides post-quantum key establishment.
-- Sender encapsulates using Receiver public key.
-- Receiver decapsulates using private key.
-- Both sides obtain the same shared secret.
-
-### HKDF-SHA-256
-
-- Derives a clean AES session key from the ML-KEM shared secret.
-- Avoids direct use of raw KEM output.
-- Binds the session key to protocol context.
-
-### AES-128-CCM
-
-- Provides confidentiality and integrity.
-- Rejects modified ciphertext, nonce, or tag.
-- Suitable for compact IoT messages.
+| Layer | Technology | Purpose |
+|---|---|---|
+| Post-quantum key establishment | ML-KEM-512 | Establish shared secret resistant to quantum attacks |
+| Key derivation | HKDF-SHA-256 | Derive protocol-specific AES session key |
+| Authenticated encryption | AES-128-CCM | Provide confidentiality, integrity, and tamper detection |
+| Transport | CoAP/UDP | Lightweight IoT message transport |
+| Monitoring | Splunk HEC | Centralized security telemetry |
+| Dashboard | FastAPI + React | SOC-style visualization and governance evidence |
 
 ---
 
@@ -248,7 +203,160 @@ AES-128-CCM authenticated encryption
 | Replay protection | Sequence + nonce validation | `REPLAY_REJECT` |
 | Sender validation | Sender ID check | `SENDER_AUTH_FAIL` |
 | Rate-limit protection | Request throttling/blocking | `RATE_LIMIT_HIT`, `SOURCE_BLOCKED` |
-| Governance evidence | Risk-to-event mapping | Governance dashboard |
+| Governance evidence | Risk-to-event mapping | Governance report and dashboard |
+
+---
+
+## Splunk Live Monitoring
+
+Splunk is the central telemetry layer of the project. The BL602 Sender and Receiver send runtime events directly to Splunk through HTTP Event Collector. The backend then queries Splunk through the REST API and exposes the results to the dashboard and governance module.
+
+### Splunk-Powered Live Event Timeline
+
+![Splunk Powered Live Event Timeline](docs/images/splunk/splunk_powered_live_event_timeline.png)
+
+### Recent Security Events from Splunk
+
+![Splunk Recent Security Events](docs/images/splunk/splunk_recent_security_events.png)
+
+### Example Splunk Queries
+
+Recent board events:
+
+```spl
+index=pqc_iot
+| table _time device_id role event_type severity action
+| sort - _time
+```
+
+Attack evidence:
+
+```spl
+index=pqc_iot event_type IN ("REPLAY_REJECT","AEAD_AUTH_FAIL","PK_AUTH_FAIL","RATE_LIMIT_HIT","SOURCE_BLOCKED","SENDER_AUTH_FAIL")
+| table _time device_id role event_type severity action src_ip
+| sort - _time
+```
+
+Event counts:
+
+```spl
+index=pqc_iot
+| stats count by event_type severity
+| sort - count
+```
+
+Device status:
+
+```spl
+index=pqc_iot
+| stats latest(_time) as last_seen count by device_id role
+| sort - last_seen
+```
+
+### Splunk Components Included
+
+```text
+integrations/splunk_hackerone_jira/splunk/
+├── splunk_discovery_server.py       # Auto-discovery server for boards
+├── hec_connectivity_check.py        # HEC connectivity test
+├── serial_to_hec.py                 # Backup serial-to-HEC forwarder
+├── requirements.txt
+└── dashboards/
+    ├── pqc_iot_security_posture_simple.xml
+    └── pqc_iot_security_posture_studio.json
+```
+
+> 📌 Add your own Splunk Search UI screenshot later if needed:
+>
+> ```markdown
+> ![Splunk Search Events](docs/images/splunk/splunk_search_events.png)
+> ```
+
+---
+
+## Security Command Center Dashboard
+
+The React dashboard provides an attractive SOC-style interface for presenting the project. It visualizes live Splunk telemetry, security events, attack validation evidence, governance status, and device state.
+
+### Overview Dashboard
+
+![Security Command Center Overview](docs/images/dashboard/security_command_center_overview.png)
+
+### Live Events and Attack Validation
+
+![Live Events and Attack Validation](docs/images/dashboard/live_events_attack_validation.png)
+
+### Governance Compliance View
+
+![Governance Compliance View](docs/images/dashboard/governance_compliance_view.png)
+
+### Risk Register Detail View
+
+![Risk Register Detail View](docs/images/dashboard/risk_register_detail_view.png)
+
+---
+
+## Governance and Risk Reporting
+
+The governance module maps technical telemetry to risk evidence. It converts live Splunk events into a risk posture that can be used for reporting, audit, and conference presentation.
+
+### Live Governance Connection and Overall Posture
+
+![Governance Report Connection and Posture](docs/images/governance/governance_report_connection_and_posture.png)
+
+### Live Splunk Telemetry Counts
+
+![Governance Live Telemetry Counts](docs/images/governance/governance_live_telemetry_counts.png)
+
+### Controls Implementation
+
+![Governance Controls Implementation](docs/images/governance/governance_controls_implementation.png)
+
+### Full Risk Register with Live Evidence
+
+![Governance Risk Register Live Evidence](docs/images/governance/governance_risk_register_live_evidence.png)
+
+### Residual Risk Breakdown
+
+![Governance Residual Risk Breakdown](docs/images/governance/governance_residual_risk_breakdown.png)
+
+### OWASP IoT Coverage
+
+![Governance OWASP Coverage](docs/images/governance/governance_owasp_coverage.png)
+
+### Recent Security Events from Splunk
+
+![Governance Recent Security Events](docs/images/governance/governance_recent_security_events.png)
+
+### Compliance Score Explanation
+
+![Governance Compliance Explanation](docs/images/governance/governance_compliance_explanation.png)
+
+### Status and Category Breakdown
+
+![Governance Status and Categories](docs/images/governance/governance_status_and_categories.png)
+
+### Risk-to-Evidence Mapping
+
+| Risk ID | Risk | Live Evidence |
+|---|---|---|
+| R-001 | Replay Attack | `REPLAY_REJECT` |
+| R-002 | AEAD Authentication Failure | `AEAD_AUTH_FAIL` |
+| R-003 | ML-KEM Public Key Substitution MITM | `PK_AUTH_FAIL`, `PK_AUTH_OK` |
+| R-005 | Rate Limit Bypass via Flooding | `RATE_LIMIT_HIT`, `SOURCE_BLOCKED` |
+| R-008 | Wi-Fi Network Eavesdropping | `MSG_DECRYPTED`, encrypted payload evidence |
+
+Run the governance report manually:
+
+```bash
+cd ~/sdk/bl602_iot_sdk/PQC_final
+pyenv activate bl_venv
+
+python3 integrations/splunk_hackerone_jira/governance/governance_test_harness.py \
+  --env-file .env \
+  --splunk-host localhost \
+  --splunk-port 8089
+```
 
 ---
 
@@ -271,18 +379,18 @@ The attacker is not assumed to have physical access to the Receiver private key 
 
 ## Attack Validation
 
-The project includes defensive validation scripts in `pqc_attacks/`. These scripts are designed for your own lab environment to verify that the Receiver rejects malicious or invalid traffic.
+The project includes a defensive attack validation suite in `pqc_attacks/`. These tests are intended for the owner’s local lab environment only.
 
-| Test | Attack Type | Expected Result | Splunk Evidence |
+| Test | Attack Type | Expected Result | Splunk / Governance Evidence |
 |---|---|---|---|
-| 01 | Replay attack | Replayed message rejected | `REPLAY_REJECT` |
+| 01 | Replay attack | Replayed packet rejected | `REPLAY_REJECT` |
 | 02 | AEAD ciphertext tamper | Modified ciphertext rejected | `AEAD_AUTH_FAIL` |
-| 03 | DoS / flood attempt | Rate limit triggered | `RATE_LIMIT_HIT` |
-| 04 | Wrong Sender ID | Unauthorized source rejected | `SOURCE_BLOCKED` / `SENDER_AUTH_FAIL` |
-| 05 | Malformed CoAP injection | Packet rejected | `SOURCE_BLOCKED` |
+| 03 | DoS / rate-limit flood | Rate limit triggered | `RATE_LIMIT_HIT` |
+| 04 | Wrong Sender ID | Unauthorized sender/source blocked | `SOURCE_BLOCKED`, `SENDER_AUTH_FAIL` |
+| 05 | Malformed CoAP injection | Malformed packet rejected | `SOURCE_BLOCKED` |
 | 06 | Public-key substitution | Fingerprint mismatch detected | `PK_AUTH_FAIL` |
 
-Run attack validation:
+Run all tests:
 
 ```bash
 cd ~/sdk/bl602_iot_sdk/PQC_final/pqc_attacks
@@ -290,7 +398,7 @@ pyenv activate bl_venv
 python3 run_all.py
 ```
 
-Run a single test:
+Run one test:
 
 ```bash
 python3 run_all.py --only 01
@@ -303,57 +411,6 @@ python3 run_all.py --only 06
 
 ---
 
-## Governance and Risk Reporting
-
-The governance layer maps live Splunk telemetry to risk evidence. It produces a risk posture showing whether technical controls are working.
-
-Example mappings:
-
-| Risk ID | Risk | Live Evidence |
-|---|---|---|
-| R-001 | Replay Attack | `REPLAY_REJECT` |
-| R-002 | AEAD Authentication Failure | `AEAD_AUTH_FAIL` |
-| R-003 | ML-KEM Public Key Substitution MITM | `PK_AUTH_FAIL`, `PK_AUTH_OK` |
-| R-005 | Rate Limit Bypass via Flooding | `RATE_LIMIT_HIT`, `SOURCE_BLOCKED` |
-| R-008 | Wi-Fi Network Eavesdropping | `MSG_DECRYPTED`, encrypted payload evidence |
-
-Run the governance report:
-
-```bash
-cd ~/sdk/bl602_iot_sdk/PQC_final
-pyenv activate bl_venv
-
-python3 integrations/splunk_hackerone_jira/governance/governance_test_harness.py \
-  --env-file .env \
-  --splunk-host localhost \
-  --splunk-port 8089
-```
-
-<details>
-<summary><strong>Governance Report Screenshots</strong></summary>
-
-![Governance Report 01](docs/images/governance/governance_report_01.png)
-
-![Governance Report 02](docs/images/governance/governance_report_02.png)
-
-![Governance Report 03](docs/images/governance/governance_report_03.png)
-
-![Governance Report 04](docs/images/governance/governance_report_04.png)
-
-![Governance Report 05](docs/images/governance/governance_report_05.png)
-
-![Governance Report 06](docs/images/governance/governance_report_06.png)
-
-![Governance Report 07](docs/images/governance/governance_report_07.png)
-
-![Governance Report 08](docs/images/governance/governance_report_08.png)
-
-![Governance Report 09](docs/images/governance/governance_report_09.png)
-
-</details>
-
----
-
 ## Hardware Requirements
 
 ### Mandatory
@@ -363,7 +420,7 @@ python3 integrations/splunk_hackerone_jira/governance/governance_test_harness.py
 - USB serial connection for each board
 - Wi-Fi access point or laptop hotspot
 - Linux development machine
-- Splunk Enterprise or Splunk local instance
+- Splunk Enterprise or local Splunk instance
 
 ### Optional
 
@@ -380,8 +437,7 @@ python3 integrations/splunk_hackerone_jira/governance/governance_test_harness.py
 - RISC-V toolchain included with BL602 SDK
 - Python 3.12 or compatible Python environment
 - `pyenv` virtual environment, for example `bl_venv`
-- Docker optional for external dashboards
-- Node.js and npm for frontend development
+- Node.js and npm for dashboard frontend
 - Splunk Enterprise with HEC enabled
 
 ---
@@ -424,7 +480,9 @@ PQC_CORRECT_FP=CHANGE_ME_64_HEX_CHARS
 
 ---
 
-## Build Firmware
+## Build and Run
+
+### Build Firmware
 
 ```bash
 cd ~/sdk/bl602_iot_sdk/PQC_final
@@ -439,9 +497,7 @@ bash tools/build_firmware.sh --role Receiver --clean
 bash tools/build_firmware.sh --role sender --clean
 ```
 
----
-
-## Flash Firmware
+### Flash Firmware
 
 Check serial ports:
 
@@ -463,11 +519,7 @@ cd ~/sdk/bl602_iot_sdk/PQC_final/sender
 blflash flash build_out/sender.bin --port /dev/ttyUSB0
 ```
 
----
-
-## Run the System
-
-### Terminal 1 — Start Splunk
+### Start Splunk
 
 ```bash
 sudo /opt/splunk/bin/splunk start --run-as-root
@@ -479,32 +531,29 @@ Open Splunk:
 http://localhost:8000
 ```
 
-### Terminal 2 — Start Splunk Discovery Server
+### Start Splunk Discovery Server
 
 ```bash
 cd ~/sdk/bl602_iot_sdk/PQC_final/integrations/splunk_hackerone_jira/splunk
 pyenv activate bl_venv
-
 python3 splunk_discovery_server.py --hec-port 8088 --proactive
 ```
 
-### Terminal 3 — Start Receiver Monitor
+### Start Receiver Monitor
 
 ```bash
 cd ~/sdk/bl602_iot_sdk/PQC_final
 pyenv activate bl_venv
-
 python3 sender/tools/monitor/monitor.py -d /dev/ttyUSB1 -b 2000000
 ```
 
 Reset the Receiver board.
 
-### Terminal 4 — Start Sender Monitor
+### Start Sender Monitor
 
 ```bash
 cd ~/sdk/bl602_iot_sdk/PQC_final
 pyenv activate bl_venv
-
 python3 sender/tools/monitor/monitor.py -d /dev/ttyUSB0 -b 2000000
 ```
 
@@ -514,12 +563,11 @@ Reset the Sender board.
 
 ## Run Security Command Center
 
-Start the dashboard in single-port mode:
+Single-port mode:
 
 ```bash
 cd ~/sdk/bl602_iot_sdk/PQC_final
 pyenv activate bl_venv
-
 bash tools/run_security_command_center_single_port.sh
 ```
 
@@ -554,42 +602,6 @@ http://localhost:5173
 
 ---
 
-## Splunk Queries
-
-Recent live events:
-
-```spl
-index=pqc_iot
-| table _time device_id role event_type severity action
-| sort - _time
-```
-
-Attack evidence:
-
-```spl
-index=pqc_iot event_type IN ("REPLAY_REJECT","AEAD_AUTH_FAIL","PK_AUTH_FAIL","RATE_LIMIT_HIT","SOURCE_BLOCKED","SENDER_AUTH_FAIL")
-| table _time device_id role event_type severity action src_ip
-| sort - _time
-```
-
-Event counts:
-
-```spl
-index=pqc_iot
-| stats count by event_type severity
-| sort - count
-```
-
-Device status:
-
-```spl
-index=pqc_iot
-| stats latest(_time) as last_seen count by device_id role
-| sort - last_seen
-```
-
----
-
 ## Performance Measurements
 
 | Parameter | Typical Result | Meaning |
@@ -618,25 +630,6 @@ index=pqc_iot
 | Flood/rate-limit detection | Verified | `RATE_LIMIT_HIT`, `SOURCE_BLOCKED` |
 | Wrong sender rejection | Verified | `SENDER_AUTH_FAIL` |
 | Governance mapping | Verified | Dashboard and governance report |
-
----
-
-## Production Readiness
-
-This project is a strong **research prototype / thesis-ready proof of concept**. It is not presented as a finished commercial IoT product.
-
-For production deployment, the following should be added:
-
-- secure boot,
-- signed firmware updates,
-- hardware-backed private key storage,
-- certificate or signed provisioning,
-- stronger fleet management,
-- parser fuzzing,
-- formal protocol review,
-- long-term load testing,
-- production-grade key rotation,
-- mTLS/TLS-secured telemetry transport where feasible.
 
 ---
 
@@ -688,6 +681,25 @@ output/
 .idea/
 .DS_Store
 ```
+
+---
+
+## Production Readiness
+
+This project is a strong **research prototype / thesis-ready proof of concept**. It is not presented as a finished commercial IoT product.
+
+For production deployment, the following should be added:
+
+- secure boot,
+- signed firmware updates,
+- hardware-backed private key storage,
+- certificate or signed provisioning,
+- stronger fleet management,
+- parser fuzzing,
+- formal protocol review,
+- long-term load testing,
+- production-grade key rotation,
+- mTLS/TLS-secured telemetry transport where feasible.
 
 ---
 
