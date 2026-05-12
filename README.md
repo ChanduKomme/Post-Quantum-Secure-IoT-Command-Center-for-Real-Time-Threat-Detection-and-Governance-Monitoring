@@ -23,7 +23,7 @@ This repository is not only a firmware project. It combines secure embedded comm
 
 ---
 
-## 📸 Project Preview
+## Project Preview
 
 ### Security Command Center Overview
 
