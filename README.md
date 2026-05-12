@@ -41,23 +41,6 @@ The system forwards runtime security events to Splunk using HTTP Event Collector
 
 ---
 
-## Table of Contents
-
-- [System Scenario](#system-scenario)
-- [High-Level Architecture](#high-level-architecture)
-- [Protocol Flow](#protocol-flow)
-- [Repository Structure](#repository-structure)
-- [Firmware Runtime Evidence](#firmware-runtime-evidence)
-- [Splunk Live Monitoring](#splunk-live-monitoring)
-- [Security Command Center Dashboard](#security-command-center-dashboard)
-- [Governance and Risk Reporting](#governance-and-risk-reporting)
-- [Attack Validation](#attack-validation)
-- [Build and Run](#build-and-run)
-- [GitHub Safety Checklist](#github-safety-checklist)
-- [Future Work](#future-work)
-
----
-
 ## System Scenario
 
 The system implements a layered secure IoT model with live monitoring and governance evidence.
@@ -239,18 +222,7 @@ index=pqc_iot
 | sort - last_seen
 ```
 
-### Splunk Components Included
 
-```text
-integrations/splunk_hackerone_jira/splunk/
-├── splunk_discovery_server.py       # Auto-discovery server for boards
-├── hec_connectivity_check.py        # HEC connectivity test
-├── serial_to_hec.py                 # Backup serial-to-HEC forwarder
-├── requirements.txt
-└── dashboards/
-    ├── pqc_iot_security_posture_simple.xml
-    └── pqc_iot_security_posture_studio.json
-```
 
 > 📌 Add your own Splunk Search UI screenshot later if needed:
 >
