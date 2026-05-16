@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-# Build sanitized BL602 firmware. Requires BL60X_SDK_PATH and the BL602 SDK/toolchain.
-# This wrapper also fixes the BL602 SDK customer_app symlink expectation automatically.
+
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
