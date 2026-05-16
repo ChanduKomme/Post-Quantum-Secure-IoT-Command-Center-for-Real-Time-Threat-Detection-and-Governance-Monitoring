@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Auto-detect Receiver fingerprint + IP from serial, then provision Sender.
-# Default: static gateway IP is NOT stored. Sender uses runtime broadcast discovery,
-# so DHCP IP changes do not require editing security_profile.h again.
-# The Receiver RNG pairing code is confirmed before the Sender profile is written.
+
 
 set -euo pipefail
 
