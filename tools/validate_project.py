@@ -23,7 +23,7 @@ def _chars(values: list[int]) -> str:
 SECRET_PATTERNS = [
     ("old Splunk token", re.compile(_chars([52,56,48,100,54,53,57,53,45,97,98,100,55,45,52,49,54,101,45,56,53,100,49,45,51,50,50,52,54,56,52,54,56,49,99,54]), re.I)),
     ("old password", re.compile(_chars([75,111,109,109,101,99,104,97,110,100,117,64,50,48,48,49]), re.I)),
-    ("project-local username credential", re.compile(_chars([83,80,76,85,78,75,95,85,83,69,82]) + r"\s*=\s*" + _chars([99,104,97,110,100,117]), re.I)),
+    ("project-local username credential", re.compile(_chars([83,80,76,85,78,75,95,85,83,69,82]) + r"\s*=\s*" + _chars([99,104,97,110,100,117]), re.I)),  
 ]
 ALLOW_PLACEHOLDER_FILES = {".env.example"}
 
