@@ -18,7 +18,7 @@ fi
 
 FINGERPRINT_HEX="$1"
 GATEWAY_IP="$2"
-SENDER_ID="${3:-0x53454E31}"
+SENDER_ID="${3:-0x53454E31}" 
 ALLOW_DISCOVERY_FLAG=""
 
 # Check for --allow-discovery in any argument
@@ -37,7 +37,7 @@ python3 "$SCRIPT_DIR/provision_fingerprint.py" \
   --gateway-ip "$GATEWAY_IP" \
   --sender-id "$SENDER_ID" \
   --out "$OUTPUT" \
-  $ALLOW_DISCOVERY_FLAG
+  $ALLOW_DISCOVERY_FLAG 
 
 echo ""
 echo "Next steps:"
