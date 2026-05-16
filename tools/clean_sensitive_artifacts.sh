@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-# Remove local secrets and generated artifacts before publishing.
+
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 rm -f "$ROOT/.env" "$ROOT"/*.env "$ROOT/integrations/splunk_hackerone_jira/.env" "$ROOT/thesis_demo/.env"
