@@ -13,7 +13,7 @@ import socket
 import threading
 import time
 
-MAGIC_PREFIX = "PQC_SPLUNK_HOST"
+MAGIC_PREFIX = "PQC_SPLUNK_HOST"   
 
 
 def get_primary_lan_ip() -> str:
