@@ -1,22 +1,5 @@
 #!/usr/bin/env bash
-# provision_sender_profile.sh
-# ─────────────────────────────────────────────────────────────────────────────
-# Convenience wrapper around provision_fingerprint.py.
-#
-# Usage:
-#   ./host-tools/provision_sender_profile.sh \
-#     <64-hex-fingerprint> \
-#     <gateway-ip> \
-#     [sender-id]       (optional, default: 0x53454E31)
-#     [--allow-discovery]
-#
-# Example (fingerprint from receiver boot log):
-#   ./host-tools/provision_sender_profile.sh \
-#     "F533B2C6CDB08FF37C3E0E1BBA3D49651F8CA1DF7E75AA840E8F4AD963756929" \
-#     "192.168.1.75"
-#
-# After running this, rebuild and flash the sender firmware.
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 set -euo pipefail
 
