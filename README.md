@@ -574,9 +574,6 @@ http://localhost:5173
 
 ## Production Readiness
 
-This project is a strong **research prototype / thesis-ready proof of concept**. It is not presented as a finished commercial IoT product.
-
-For production deployment, the following should be added:
 
 - secure boot,
 - signed firmware updates,
