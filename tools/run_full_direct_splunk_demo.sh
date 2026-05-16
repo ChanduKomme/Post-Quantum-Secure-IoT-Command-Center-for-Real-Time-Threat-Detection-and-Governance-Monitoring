@@ -1,7 +1,3 @@
-#!/usr/bin/env bash
-# Convenience launcher for the host-side parts of the direct board-to-Splunk demo.
-# It does not flash boards. It starts Splunk if present, checks HEC, opens firewall,
-# and starts the robust discovery server.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
