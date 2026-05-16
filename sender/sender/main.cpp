@@ -358,7 +358,7 @@ static bool recv_coap_response(int sock_fd,
 
         CoapMessage cm;
         if (!coap_parse(&cm, g_rx_buf, (size_t)n)) continue;
-        if (cm.ver != 1u || cm.token_len != 0u) continue;
+        if (cm.ver != 1u || cm.token_len != 0u) continue; 
         if (cm.type != COAP_TYPE_ACK) continue;
         if (cm.msg_id != expected_msg_id) continue;
         if (expected_uri && strcmp(cm.uri_path, expected_uri) != 0) continue;
