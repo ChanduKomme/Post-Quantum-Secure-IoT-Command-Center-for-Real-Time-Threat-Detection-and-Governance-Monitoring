@@ -65,11 +65,7 @@ flowchart LR
     B --> F[React Security Command Center]
 ```
 
-> 📌 Optional image slot for your own architecture diagram:
->
-> ```markdown
-> ![Overall Architecture](docs/images/architecture/overall_architecture.png)
-> ```
+
 
 ---
 
