@@ -1,4 +1,4 @@
-# Post-Quantum Secure IoT Command Center for Real-Time Threat Detection and Governance Monitoring
+# Post-Quantum Secure IoT for Real-Time Threat Detection and Governance Monitoring
 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
